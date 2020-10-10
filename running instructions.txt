@@ -1,0 +1,15 @@
+run like this: py -3.7 citybot.py
+
+use this dosbox config (no fullscreen, NO AUTOLOCK (!)):
+
+fullscreen=false
+fulldouble=false
+fullresolution=original
+windowresolution=original
+output=ddraw
+autolock=false
+sensitivity=100
+waitonerror=true
+priority=higher,normal
+mapperfile=mapper.txt
+usescancodes=true

@@ -1,0 +1,70 @@
+    #create big map
+    map_size = 130
+    map_array = [[None for _ in range(map_size)] for __ in range(map_size)]
+
+    map_slices = []
+
+    #mapslice 8x8 array
+    #total mapslices = 8x8/128x128 = 256
+    #create mapslice relative to camera position and v_cursor
+    #v_cursor should always be in top of map_slice
+    slice_size = 10
+    slice_distance_v = 4
+    slice_distance_h = 5
+
+    slice_number = 0
+    for mslice_x in range(12):
+        moves_up = 0
+        moves_down = 0
+        moves_right = 0
+        moves_left = 0
+        for mslice in range(12):
+            map_slice_array = [[None for _ in range(slice_size)] for __ in range(slice_size)] 
+            map_slice = mu.MapSlice(slice_number, map_slice_array, moves_up, moves_down, moves_left, moves_right)
+            slice_number += 1
+            it_cursor = bot.navigator.v_cursor
+            outer_cursor = bot.navigator.v_cursor
+            for x in range(slice_size):
+                for y in range(slice_size):
+                    coord_x = (mslice_x * slice_size) + x
+                    coord_y = (mslice * slice_size) + y
+                    screen_x = it_cursor[0]
+                    screen_y = it_cursor[1]
+                    color = cg.get_pixel_color(it_cursor[0], it_cursor[1])
+                    terrain = t.Terrain.types.get(color, ("U", color))
+                    tile = mu.Tile(coord_x, coord_y, screen_x, screen_y, mslice, terrain)
+                    map_array[coord_x][coord_y] = tile
+                    print(coord_x, coord_y, " equals ", screen_x, screen_y)
+                    map_slice.tiles[x][y] = tile
+                    it_cursor = (it_cursor[0] - round(tp.TILE_WIDTH/2), round(it_cursor[1] + tp.TILE_HEIGHT/2))
+                outer_cursor = (outer_cursor[0] + round(tp.TILE_WIDTH/2), round(outer_cursor[1] + tp.TILE_HEIGHT/2))
+                it_cursor = outer_cursor
+            print("SLICE INFO: ", mslice, "Moves: ", map_slice.position[1], map_slice.position[2])
+            map_slices.append(map_slice)
+            
+            for y in range(slice_distance_v):
+                bot.navigator.move_tile("down")
+                
+            for x in range(slice_distance_h):
+                bot.navigator.move_tile("left")
+
+            moves_down += slice_distance_v
+            moves_left += slice_distance_h
+            camera.down = moves_down
+            camera.left = moves_left
+        for x in range(camera.left):
+            bot.navigator.move_tile("right")
+                
+        for y in range(camera.down):
+            bot.navigator.move_tile("up")
+
+        camera.left = 0
+        camera.down = 0
+
+        for y in range(slice_distance_v):
+            bot.navigator.move_tile("down")
+            camera.down += 1
+            
+        for x in range(slice_distance_h):
+            bot.navigator.move_tile("right")
+            camera.left -= 1
