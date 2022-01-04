@@ -1,3 +1,4 @@
+instructions
 run like this: py -3.7 citybot.py
 
 use this dosbox config (no fullscreen, NO AUTOLOCK (!)):
